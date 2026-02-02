@@ -1,0 +1,5 @@
+{
+  "name": "Gemini 8-Bit Componist",
+  "description": "Een interactieve 8-bit muziekspeler en componist geïnspireerd door de klassieke Game Boy. Gebruikt Gemini om authentieke chiptune melodieën te genereren en de Web Audio API voor synthese.",
+  "requestFramePermissions": []
+}
