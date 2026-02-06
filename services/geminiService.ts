@@ -54,12 +54,11 @@ export async function generateAIPatterns(
   const ai = new GoogleGenAI({ apiKey: key });
   
   try {
-    console.log("Requesting AI Composition (Gemini 2.0 Flash):", settings);
+    console.log("Requesting AI Composition (Gemini 3 Flash Preview):", settings);
     
-    // CHANGED: Using gemini-2.0-flash per user request.
-    // If this fails with 429/Quota, please downgrade to 'gemini-1.5-flash'.
+    // CHANGED: Using gemini-3-flash-preview per user request.
     const responseStream = await ai.models.generateContentStream({
-        model: "gemini-2.0-flash", 
+        model: "gemini-3-flash-preview", 
         contents: generateTrackPrompt(settings),
         config: {
             systemInstruction: SYSTEM_INSTRUCTION,
@@ -168,7 +167,7 @@ export async function generateCustomClips(prompt: string, channels: number[], le
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     try {
         const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash", 
+            model: "gemini-3-flash-preview", 
             contents: generateClipPrompt(prompt, channels, length),
             config: {
                 systemInstruction: SYSTEM_INSTRUCTION,
@@ -204,7 +203,7 @@ export async function suggestBassline(melodyRows: TrackerRow[]): Promise<Partial
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     try {
         const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash", 
+            model: "gemini-3-flash-preview", 
             contents: `Create a bassline (Channel 3) for this melody. 
             Melody: ${JSON.stringify(melodyRows.map(r => ({s: r.step, p: r.pitch})))}.
             Return compact notes: {s, p, v}.`,
