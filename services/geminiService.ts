@@ -47,19 +47,22 @@ export async function generateAIPatterns(
     onStreamUpdate?: (text: string) => void
 ): Promise<{patterns: Pattern[], arrangement: string[], bpm: number}> {
   
-  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
+  // Debug check for API Key (Masked for security in logs)
+  const key = process.env.API_KEY;
+  console.log(`[System] Initializing Gemini AI. Key present: ${!!key}, Length: ${key ? key.length : 0}`);
+
+  const ai = new GoogleGenAI({ apiKey: key });
   
   try {
-    console.log("Requesting AI Composition (Flash 2.0 Model):", settings);
+    console.log("Requesting AI Composition (Gemini 2.0 Flash):", settings);
     
-    // CHANGED: Reverted to gemini-2.0-flash per user request
+    // CHANGED: Using gemini-2.0-flash per user request.
+    // If this fails with 429/Quota, please downgrade to 'gemini-1.5-flash'.
     const responseStream = await ai.models.generateContentStream({
         model: "gemini-2.0-flash", 
         contents: generateTrackPrompt(settings),
         config: {
             systemInstruction: SYSTEM_INSTRUCTION,
-            // We do NOT enforce JSON mode here strictly because we want the text analysis first.
-            // But we do hint the schema.
             responseMimeType: "text/plain", 
         },
     });
@@ -133,7 +136,6 @@ export async function generateAIPatterns(
     generatedPatterns.unshift(introPattern);
 
     // 3. Construct Arrangement
-    // Structure: Intro -> Verse -> Chorus -> Verse -> Bridge -> Chorus -> Outro
     const verseId = sectionIdMap['VERSE'] || generatedPatterns[1].id;
     const chorusId = sectionIdMap['CHORUS'] || (generatedPatterns.length > 2 ? generatedPatterns[2].id : verseId);
     const bridgeId = sectionIdMap['BRIDGE'] || (generatedPatterns.length > 3 ? generatedPatterns[3].id : chorusId);
@@ -166,7 +168,7 @@ export async function generateCustomClips(prompt: string, channels: number[], le
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     try {
         const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash", // Reverted to 2.0-flash
+            model: "gemini-2.0-flash", 
             contents: generateClipPrompt(prompt, channels, length),
             config: {
                 systemInstruction: SYSTEM_INSTRUCTION,
@@ -202,7 +204,7 @@ export async function suggestBassline(melodyRows: TrackerRow[]): Promise<Partial
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     try {
         const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash", // Reverted to 2.0-flash
+            model: "gemini-2.0-flash", 
             contents: `Create a bassline (Channel 3) for this melody. 
             Melody: ${JSON.stringify(melodyRows.map(r => ({s: r.step, p: r.pitch})))}.
             Return compact notes: {s, p, v}.`,
