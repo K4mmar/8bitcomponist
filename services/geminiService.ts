@@ -50,9 +50,9 @@ export async function generateAIPatterns(
   const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   
   try {
-    console.log("Requesting AI Composition (Flash Model - High Speed):", settings);
+    console.log("Requesting AI Composition (Flash 2.0 Model):", settings);
     
-    // CHANGED: Use gemini-2.0-flash for reliable free tier access
+    // CHANGED: Reverted to gemini-2.0-flash per user request
     const responseStream = await ai.models.generateContentStream({
         model: "gemini-2.0-flash", 
         contents: generateTrackPrompt(settings),
@@ -166,7 +166,7 @@ export async function generateCustomClips(prompt: string, channels: number[], le
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     try {
         const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash", // Flash is fine for small clips
+            model: "gemini-2.0-flash", // Reverted to 2.0-flash
             contents: generateClipPrompt(prompt, channels, length),
             config: {
                 systemInstruction: SYSTEM_INSTRUCTION,
@@ -202,7 +202,7 @@ export async function suggestBassline(melodyRows: TrackerRow[]): Promise<Partial
     const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
     try {
         const response = await ai.models.generateContent({
-            model: "gemini-2.0-flash",
+            model: "gemini-2.0-flash", // Reverted to 2.0-flash
             contents: `Create a bassline (Channel 3) for this melody. 
             Melody: ${JSON.stringify(melodyRows.map(r => ({s: r.step, p: r.pitch})))}.
             Return compact notes: {s, p, v}.`,
